@@ -48,3 +48,21 @@ Changed: claims 3, 8, 10 were first marked "untested"; at my request Claude then
 Rejected: —
 Checked: claims vs my rows and screenshots; claims 3, 8, 10 by Claude's scripted run (not by me in the browser).
 Commit: (not committed yet)
+
+## 2026-11-01 — Fix A
+Tool: Claude Code (Claude Opus 5.5)
+Asked for: the one sentence for A from VERDICTS.md (row 2: `0 đ` instead of `12.360.000 đ`, `forEach(async …)` at a.js:51–56; keep the stock requests started together, `textContent` only, no `console.error`), change only a.js, then rerun every row + the parallel check.
+Kept: a.js:51–53 — `await Promise.all(products.map((p) => getStock(p.id)))`, then `reduce` for the total; a 5-line change, nothing else in the file touched.
+Changed: —
+Rejected: —
+Checked: by Claude with headless Chrome (../IA3-tools/run-rows.mjs, original server.mjs on port 5051): rows 1–7 + empty PASS on the fixed A, Stock value `12.360.000 đ`; parallel — 8 /api/stock requests started within 9 ms, all before the first one finished (121 ms); tsc: no error in a.js. The same script on the original B and C gave the same results as my browser runs (B row 6 FAIL, C all PASS). Side effect: a failing stock request now goes to the `catch` (cards cleared + Retry) instead of an Uncaught — no row covers it. Then rerun by me in the browser (normal, slow, error→Retry, hang, empty): OK.
+Commit: "Fix A: row 2 — wait for all stock requests with Promise.all"
+
+## 2026-11-01 — Fix B
+Tool: Claude Code (Claude Opus 5.5)
+Asked for: the one sentence for B from VERDICTS.md (rows 6 and 8: in `hang` the error only appears after the 504 at 30.28 s, tsc TS2353 at b.js:16:51 because `fetch` has no `timeout` option; abort after 5 s with a real signal and change nothing else).
+Kept: b.js:16 — `{ timeout: 5000 }` → `{ signal: AbortSignal.timeout(5000) }`; one line, nothing else touched.
+Changed: —
+Rejected: —
+Checked: by Claude with headless Chrome (../IA3-tools/run-rows.mjs, original server.mjs on port 5051): rows 1–7 + empty PASS; row 6 — `Loading products…` at 4 s, `Could not load products.` + Retry at 7 s; parallel — 8 /api/stock requests started within 3 ms, before the first finished (204 ms); tsc: no error in b.js (only the 2 starter errors in panel.js). Then rerun by me in the browser (hang ~5 s, tsc, normal, slow, error→Retry, empty): OK.
+Commit: "Fix B: rows 6, 8 — abort products request after 5 s with AbortSignal.timeout"
