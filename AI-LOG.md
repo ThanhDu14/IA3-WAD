@@ -66,3 +66,12 @@ Changed: —
 Rejected: —
 Checked: by Claude with headless Chrome (../IA3-tools/run-rows.mjs, original server.mjs on port 5051): rows 1–7 + empty PASS; row 6 — `Loading products…` at 4 s, `Could not load products.` + Retry at 7 s; parallel — 8 /api/stock requests started within 3 ms, before the first finished (204 ms); tsc: no error in b.js (only the 2 starter errors in panel.js). Then rerun by me in the browser (hang ~5 s, tsc, normal, slow, error→Retry, empty): OK.
 Commit: "Fix B: rows 6, 8 — abort products request after 5 s with AbortSignal.timeout"
+
+## 2026-11-01 — CSR-SSR.md
+Tool: Claude Code (Claude Opus 5.5)
+Asked for: the Step 6 prompt — write CSR-SSR.md from my notes only: `/ssr` source has the product data, `?v=a` has none; JS off → `?v=a` shows no products, `/ssr` still shows products and stock value; the scarf line from `/ssr`'s source; `?v=a` 15 requests, `/ssr` 3 requests (Firefox).
+Kept: each answer quotes what I saw; Claude added the matching lines in server.mjs (`escapeHtml` at 67/81, stock value at 99) and the Q2 explanation (escaping on the server and `textContent` in the browser both treat the name as text).
+Changed: Claude first described `?v=a`'s source as an "empty page skeleton", which I had not written — removed. Q5 sentence drafted by Claude from my Q3/Q4 observations.
+Rejected: —
+Checked: by me in Firefox (View source, Disable JavaScript in DevTools settings, Network count).
+Commit: "CSR vs SSR answers from my observations"
