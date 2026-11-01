@@ -29,20 +29,20 @@ Drafted with Claude Code (Claude Opus 5.5) from reading `a.js` beside `brief.md`
 ### Results
 | Row | PASS/FAIL | What I saw (screen / Network / Console / terminal) | Evidence |
 |---|---|---|---|
-| 1 | | | |
-| 2 | | | |
-| 3 | | | |
-| 4 | | | |
-| 5 | | | |
-| 6 | | | |
-| 7 | | | |
-| 8 | | | |
-| empty | | | |
+| 1 | PASS | `normal`: 8 cards in API order (T-shirt, Hoodie, Áo sơ mi…, Cap, Tote bag, Socks, Jacket, Scarf), prices like `180.000 đ`, no status text above the cards. | `evidence/a-row2.png` |
+| 2 | **FAIL** | `normal`, Disable cache on: Stock value reads **`0 đ`** (expected `12.360.000 đ`) even though all 8 `/api/stock/*` requests returned `200` (Network, initiator `a.js:20`); screenshot taken after Finish 1.76 s, value still `0 đ`. | `evidence/a-row2.png` |
+| 3 | PASS | Last card reads `Scarf <i>limited</i>` with the brackets visible, not italic. | `evidence/a-row2.png` |
+| 4 | PASS | `slow`: `Loading products…` for about 3 s, then 8 cards, status cleared. | — |
+| 5 | PASS | `error`: `Could not load products.` + Retry, no cards. Switched to `normal`, Retry: 8 cards, message and button gone. | — |
+| 6 | PASS | `hang`: `Could not load products.` + Retry after about 5 s. | — |
+| 7 | PASS | Console during rows 1–6: no `Uncaught …`, nothing printed by the version. | — |
+| 8 | PASS | `tsc -p jsconfig.json --noEmit --checkJs`: "Found 3 errors in 2 files", only `panel.js:11`, `panel.js:30` (starter) and `b.js:16`. No error points at `a.js`. | `evidence/b-row8.png` (same run) |
+| empty | PASS | `empty`: `No products yet.` and `0 đ`. | — |
 
-- Line(s) responsible:
-- Verdict: keep / fix / reject — decided by row
-- Prediction vs result:
-- The one sentence for the assistant:
+- Line(s) responsible: `a.js:51–56` — `products.forEach(async (p) => …)` does not wait for the async callbacks, so line 56 writes `formatVnd(total)` while `total` is still `0`; the stock answers arrive later and nothing writes the total again.
+- Verdict: **fix** — decided by row 2.
+- Prediction vs result: predicted FAIL on row 2 only; the table confirmed exactly that (row 2 `0 đ`, every other row PASS). Row `empty` shows `0 đ` correctly only because the bug's result happens to be the right answer there.
+- The one sentence for the assistant: "Row 2 fails on version A — in mode `normal` the Stock value shows `0 đ` instead of `12.360.000 đ` although all 8 `/api/stock/*` requests return 200, because `products.forEach(async …)` at a.js:51–56 writes the total before any stock arrives; make the total wait for every stock answer while keeping the 8 requests started together (e.g. `Promise.all`, no `await` in a loop), `textContent` only and no `console.error`."
 
 ---
 
@@ -70,20 +70,20 @@ Drafted with Claude Code (Claude Opus 5.5) from reading `b.js` beside `brief.md`
 ### Results
 | Row | PASS/FAIL | What I saw (screen / Network / Console / terminal) | Evidence |
 |---|---|---|---|
-| 1 | | | |
-| 2 | | | |
-| 3 | | | |
-| 4 | | | |
-| 5 | | | |
-| 6 | | | |
-| 7 | | | |
-| 8 | | | |
-| empty | | | |
+| 1 | PASS | `normal`: 8 cards in API order, prices like `180.000 đ`, status line empty. | — |
+| 2 | PASS | `normal`: Stock value `12.360.000 đ`. | — |
+| 3 | PASS | Last card reads `Scarf <i>limited</i>`, brackets visible, not italic. | — |
+| 4 | PASS | `slow`: `Loading products…` for about 3 s, then 8 cards, status cleared. | — |
+| 5 | PASS | `error`: `Could not load products.` + Retry, no cards. Switched to `normal`, Retry: 8 cards, message and button gone. | — |
+| 6 | **FAIL** | `hang`: `Could not load products.` + Retry appeared only when the server gave up, not at 5 s. Network: `products` **504 Gateway Timeout**, initiator `b.js:16 (fetch)`, **Finish: 30.28 s**. | `evidence/b-row6.png` |
+| 7 | PASS | Console during rows 1–6: no `Uncaught …`, nothing printed by the version. | — |
+| 8 | **FAIL** | `tsc`: `public/versions/b.js:16:51 - error TS2353: Object literal may only specify known properties, and 'timeout' does not exist in type 'RequestInit'.` | `evidence/b-row8.png` |
+| empty | PASS | `empty`: `No products yet.` and `0 đ`. | — |
 
-- Line(s) responsible:
-- Verdict: keep / fix / reject — decided by row
-- Prediction vs result:
-- The one sentence for the assistant:
+- Line(s) responsible: `b.js:16` — `fetch('/api/products', { timeout: 5000 })`: `fetch` has no `timeout` option, so it is ignored and nothing aborts the request (row 6); the same unknown property is what tsc reports (row 8).
+- Verdict: **fix** — decided by row 6 (row 8 points at the same line).
+- Prediction vs result: predicted FAIL on rows 6 and 8; the table confirmed both, every other row PASS. (Row-8 prediction was not from reading alone — see AI-LOG.)
+- The one sentence for the assistant: "Rows 6 and 8 fail on version B — in mode `hang` `Could not load products.` and Retry appear only after the server's 504 at 30.28 s instead of after 5 s, and tsc reports `b.js:16:51 TS2353 'timeout' does not exist in type 'RequestInit'`, because `fetch` has no `timeout` option; abort the products request after 5 s with a real signal (e.g. `AbortSignal.timeout(5000)`) and change nothing else — keep the stock requests in parallel with `Promise.all`, `textContent` only and no `console.error`."
 
 ---
 
@@ -111,17 +111,17 @@ Drafted with Claude Code (Claude Opus 5.5) from reading `c.js` beside `brief.md`
 ### Results
 | Row | PASS/FAIL | What I saw (screen / Network / Console / terminal) | Evidence |
 |---|---|---|---|
-| 1 | | | |
-| 2 | | | |
-| 3 | | | |
-| 4 | | | |
-| 5 | | | |
-| 6 | | | |
-| 7 | | | |
-| 8 | | | |
-| empty | | | |
+| 1 | PASS | `normal`: 8 cards in API order, prices like `180.000 đ`, status line empty. | — |
+| 2 | PASS | `normal`: Stock value `12.360.000 đ`. | — |
+| 3 | PASS | Last card reads `Scarf <i>limited</i>`, brackets visible, not italic. | — |
+| 4 | PASS | `slow`: `Loading products…` for about 3 s, then 8 cards, status cleared. | — |
+| 5 | PASS | `error`: `Could not load products.` + Retry, no cards. Switched to `normal`, Retry: 8 cards, message and button gone. | — |
+| 6 | PASS | `hang`: `Could not load products.` + Retry after about 5 s. | — |
+| 7 | PASS | Console during rows 1–6: no `Uncaught …`, nothing printed by the version. | — |
+| 8 | PASS | Same `tsc` run: no error points at `c.js` (only `panel.js` ×2 and `b.js:16`). | `evidence/b-row8.png` (same run) |
+| empty | PASS | `empty`: `No products yet.` and `0 đ`. | — |
 
-- Line(s) responsible:
-- Verdict: keep / fix / reject — decided by row
-- Prediction vs result:
-- The one sentence for the assistant:
+- Line(s) responsible: none — no row failed.
+- Verdict: **keep** — every row (1–8 + empty) passed.
+- Prediction vs result: predicted keep with no failing row; the table confirmed it.
+- The one sentence for the assistant: none needed — version C is kept as it is.

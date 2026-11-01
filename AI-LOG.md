@@ -30,3 +30,12 @@ Rejected: — (to be filled after Step 4 if a claim turns out not real)
 Checked: not yet — the assistant ran no row and no tsc; it said every claim came from reading alone. I will check each claim with a real row in Step 4.
 Process note: the first attempt was interrupted; `/export` failed (ENAMETOOLONG) because the prompt was passed as the filename, so the answer was copied from the terminal instead.
 Commit: "Assistant review of the original files (unedited)"
+
+## 2026-11-01 — Results table, verdicts and one sentences for A, B, C
+Tool: Claude Code (Claude Opus 5.5)
+Asked for: fill the Results tables in VERDICTS.md from my runs (screenshots a-row2, b-row6, b-row8 + my confirmation that every other row passed), find the responsible lines, and draft the verdict, prediction-vs-result and one sentence for each version.
+Kept: rows read off my screenshots (A row 2 `0 đ`; B row 6 504 at 30.28 s; B row 8 TS2353 at b.js:16:51; tsc shows no error in a.js or c.js); lines a.js:51–56 and b.js:16; verdicts A fix, B fix, C keep.
+Changed: Claude first wrote "the value never changed" (A row 2) and "no error after 5 s" (B row 6), which the screenshots alone do not show — reworded to what the images show. Rows I only confirmed as "pass" are written as the expected Done-means result, not with measured numbers.
+Rejected: —
+Checked: rows 1–8 + empty on A, B, C, by me in the browser and tsc in the terminal; the one sentences were drafted by Claude with my agreement and will be used as-is in Step 5.
+Commit: "Results of the Done-means table + evidence"
