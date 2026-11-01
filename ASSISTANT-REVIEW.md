@@ -199,4 +199,52 @@ Do not change any file.
 ```
 
 ## Checking each claim
-(to be filled in Step 4: | Claim | Version:line | Row/run that checked it | Confirmed / Not real |)
+
+Each claim above, checked against my runs in `VERDICTS.md` (Results tables) and the screenshots in `evidence/`.
+
+### Problems the review claimed
+
+| # | Claim | Version:line | Row/run that checked it | Confirmed / Not real |
+|---|---|---|---|---|
+| 1 | Total is written before the stock answers arrive, so Stock value shows `0 đ` instead of `12.360.000 đ` (row 2, brief item 5) | A `a.js:51–56` | A row 2, mode `normal` — Stock value `0 đ` while all 8 `/api/stock/*` returned 200 (`evidence/a-row2.png`) | **Confirmed** |
+| 2 | The stock requests in A still go out in parallel; only the total is wrong | A `a.js:51–55` | A row 2 run — Network waterfall in `evidence/a-row2.png`: the 8 stock requests start together | **Confirmed** |
+| 3 | A failing `/api/stock/:id` would print `Uncaught (in promise)` (row 7, conditional) | A `a.js:52–55` | Extra run (no Done-means row covers it): mode `normal`, `/api/stock/scarf` blocked — Console: `Uncaught … Failed to fetch` at `getStock (a.js:20)`; page shows 8 cards, status empty, Stock value `0 đ`, no Retry | **Confirmed** |
+| 4 | Possible row-8 errors (untyped params, possibly-null `firstElementChild` / `querySelector`) | A `a.js:28, 30, 31` | Row 8, `tsc -p jsconfig.json --noEmit --checkJs` — no error points at `a.js` (`evidence/b-row8.png`) | **Not real** |
+| 5 | `fetch` has no `timeout` option, so in `hang` Loading stays ~30 s until the 504, not 5 s (row 6, brief item 4) | B `b.js:16` | B row 6, mode `hang` — message + Retry only after 504, Finish 30.28 s (`evidence/b-row6.png`) | **Confirmed** |
+| 6 | `timeout` is not a property of `RequestInit`, so the type check flags it (row 8) | B `b.js:16` | B row 8, tsc — `b.js:16:51 error TS2353 … 'timeout' does not exist in type 'RequestInit'` (`evidence/b-row8.png`) | **Confirmed** |
+| 7 | Same possible null / implicit-any row-8 warnings as A | B (various) | Row 8, tsc — the only `b.js` error is TS2353 at line 16 (`evidence/b-row8.png`) | **Not real** |
+| 8 | If a stock request fails, the cards stay but the status says `Could not load products.` + Retry (confusing; conditional, no row) | B `b.js:51–56` | Extra run: mode `normal`, `/api/stock/scarf` blocked — 8 cards stay, but status reads `Could not load products.` and Retry is shown, Stock value `—`; no `Uncaught` | **Confirmed** |
+| 9 | Possible row-8 null / implicit-any warnings | C `c.js:31, 33, 34` | Row 8, tsc — no error points at `c.js` (`evidence/b-row8.png`) | **Not real** |
+| 10 | One failed `/api/stock/:id` rejects the whole `Promise.all` and the `catch` wipes all cards (conditional, no row) | C `c.js:54, 58–61` | Extra run: mode `normal`, `/api/stock/scarf` blocked — **0 cards**, `Could not load products.` + Retry, Stock value `—`; no `Uncaught` | **Confirmed** |
+
+### What the review said was fine ("no problem found")
+
+| Version | Rows the review called fine | Rows that checked it | Result |
+|---|---|---|---|
+| A | 1, 3, 4, 5, 6, empty, no `console.error` (7) | A rows 1, 3, 4, 5, 6, 7, empty — all PASS | **Confirmed** |
+| B | 1, 2, 3, 4, 5, 7, empty | B rows 1, 2, 3, 4, 5, 7, empty — all PASS | **Confirmed** |
+| C | 1, 2, 3, 4, 5, 6, 7, empty | C rows 1–7, empty — all PASS; row 8 also PASS | **Confirmed** |
+
+Note: the review left row 8 "not checked" for all three versions and only guessed. Its one specific row-8 claim (B, `b.js:16`) was right; its generic guesses for A, B and C were not real.
+
+### Failing rows my table found that the review MISSED
+
+| Version | Row | What I saw | Evidence | Did the review catch it? |
+|---|---|---|---|---|
+| — | — | none — every failing row in my table (A row 2, B row 6, B row 8) was named by the review, at the right line | — | — |
+
+### Extra run for claims 3, 8, 10 (stock request fails)
+
+No server mode makes a `/api/stock/:id` request fail, so no Done-means row tests these claims. They were checked with an extra run instead of by reading:
+mode `normal`, the `/api/stock/scarf` request blocked (same as DevTools → Network → **Block request URL**), page read 2.5 s after load.
+Run by Claude Code with headless Chrome (`../IA3-tools/block-stock.mjs`, outside the repo; screenshots `../IA3-tools/<v>-stock-blocked.png`), on a second copy of the original `server.mjs` on port 5051.
+
+| Version | Cards | Status | Stock value | Retry | Console (from the version) |
+|---|---|---|---|---|---|
+| A | 8 | (empty) | `0 đ` | hidden | `Uncaught … Failed to fetch` at `getStock (a.js:20)` |
+| B | 8 | `Could not load products.` | `—` | shown | nothing |
+| C | 0 | `Could not load products.` | `—` | shown | nothing |
+
+(The other red lines, `ERR_BLOCKED_BY_CLIENT` and a 404 for `favicon.ico`, are network lines the browser prints itself.)
+
+All three claims are confirmed. None of them changes a verdict: they are outside the Done-means table, and the grading runs only the five server modes.

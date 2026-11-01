@@ -39,3 +39,12 @@ Changed: Claude first wrote "the value never changed" (A row 2) and "no error af
 Rejected: —
 Checked: rows 1–8 + empty on A, B, C, by me in the browser and tsc in the terminal; the one sentences were drafted by Claude with my agreement and will be used as-is in Step 5.
 Commit: "Results of the Done-means table + evidence"
+
+## 2026-11-01 — Check the review's claims against my Results
+Tool: Claude Code (Claude Opus 5.5)
+Asked for: the Step 4 prompt — compare each claim in ASSISTANT-REVIEW.md with my Results in VERDICTS.md, add a claim table and a "missed" table under the unedited answer, mark claims no row tested.
+Kept: 10 claims checked — 7 confirmed (A row 2 + parallel requests, B row 6, B row 8, and the three stock-failure claims), 3 not real (generic row-8 null/implicit-any guesses for A, B, C — tsc shows no such error). Every "no problem found" row matched a PASS. Missed failing rows: none.
+Changed: claims 3, 8, 10 were first marked "untested"; at my request Claude then ran them itself with headless Chrome (../IA3-tools/block-stock.mjs, /api/stock/scarf blocked, mode normal): A → Uncaught "Failed to fetch" at a.js:20, total 0 đ; B → 8 cards stay but "Could not load products." + Retry; C → all cards removed + Retry. All three confirmed.
+Rejected: —
+Checked: claims vs my rows and screenshots; claims 3, 8, 10 by Claude's scripted run (not by me in the browser).
+Commit: (not committed yet)
