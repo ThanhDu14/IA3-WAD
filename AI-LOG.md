@@ -75,3 +75,12 @@ Changed: Claude first described `?v=a`'s source as an "empty page skeleton", whi
 Rejected: —
 Checked: by me in Firefox (View source, Disable JavaScript in DevTools settings, Network count).
 Commit: "CSR vs SSR answers from my observations"
+
+## 2026-11-01 — Final check + SELF_ASSESSMENT_REPORT.md
+Tool: Claude Code (Claude Opus 5.5)
+Asked for: write SELF_ASSESSMENT_REPORT.md (6 criteria × Max / I claim / Evidence, What I did not manage, What I would do differently).
+Kept: final check before writing it — git log order, `git diff --stat <starter>` (only a.js, b.js outside .md/evidence), one version file per fix commit; ../IA3-tools/run-rows.mjs on the final a.js, b.js, c.js: rows 1–7 + empty PASS, 8 stock requests start within 3 ms on each; tsc: no error in public/versions/*. Claimed 86/100, with the deductions listed in the report.
+Changed: —
+Rejected: —
+Checked: scores to be reviewed by me before committing.
+Commit: "Self-assessment"
