@@ -20,3 +20,13 @@ Changed: —
 Rejected: —
 Checked: not yet — no row run on B or C. Disclosure: while setting up, Claude had run the starter's tsc check once in a scratch copy to confirm the row-8 command works; its output named only b.js, so the B row-8 prediction was not made from reading alone.
 Commit: "Predictions from reading, before running"
+
+## 2026-11-01 — Review of the original a.js, b.js, c.js (entry #1 for the review)
+Tool: Claude Code v2.1.316 (Claude Opus 5.5), fresh session after `/clear`
+Asked for: the Step 2 review prompt, verbatim in ASSISTANT-REVIEW.md: review the three versions against brief.md and the Done-means table, reading only brief.md, README.md and the version files, listing line + row + what a user would see, changing no file.
+Kept: the full answer, pasted unedited into ASSISTANT-REVIEW.md. Claims: A — a.js:51–56 total written before stock arrives (row 2), a.js:52–55 uncaught rejection if a stock request fails (row 7, conditional); B — b.js:16 `timeout` is not a fetch option (row 6, row 8), b.js:51–56 confusing status if a stock request fails (conditional); C — c.js:54/58–61 one failed stock request wipes the cards (conditional); A/B/C — possible row-8 warnings, unverified.
+Changed: — (nothing yet; each claim will be checked by a row in Step 4)
+Rejected: — (to be filled after Step 4 if a claim turns out not real)
+Checked: not yet — the assistant ran no row and no tsc; it said every claim came from reading alone. I will check each claim with a real row in Step 4.
+Process note: the first attempt was interrupted; `/export` failed (ENAMETOOLONG) because the prompt was passed as the filename, so the answer was copied from the terminal instead.
+Commit: "Assistant review of the original files (unedited)"
