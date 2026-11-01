@@ -1,6 +1,6 @@
 # SELF_ASSESSMENT_REPORT — IA#3 · Three answers to one brief (CSC13008)
 
-Student: Thanhdu14 · MSSV: `<MSSV>` · Repo: https://github.com/ThanhDu14/IA3-WAD
+Student: Thanhdu14 · MSSV: 24120288 · Repo: https://github.com/ThanhDu14/IA3-WAD
 Final check run on 2026-11-01 (results below).
 
 ## Scores
